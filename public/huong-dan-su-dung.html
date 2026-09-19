@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hướng dẫn sử dụng — Cầu Lông</title>
+<style>
+  :root {
+    --background: #0b0d10;
+    --foreground: #e8e9eb;
+    --surface: #15181d;
+    --surface-hover: #1c2027;
+    --border: #262b33;
+    --muted: #8b929e;
+    --primary: #4f7cff;
+    --primary-foreground: #ffffff;
+    --success: #22c55e;
+    --warning: #eab308;
+    --danger: #ef4444;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(21, 24, 29, 0.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+  }
+
+  header .inner {
+    max-width: 880px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  nav button {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  nav button:hover {
+    color: var(--foreground);
+    background: var(--surface-hover);
+  }
+
+  nav button.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 500;
+  }
+
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  section.panel {
+    display: none;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  section.panel.active {
+    display: flex;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 24px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .intro strong { color: var(--foreground); }
+
+  h2.section-title {
+    font-size: 20px;
+    margin: 0 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .role-badge.member { background: rgba(79, 124, 255, 0.15); color: var(--primary); }
+  .role-badge.admin { background: rgba(234, 179, 8, 0.15); color: var(--warning); }
+  .role-badge.super { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+  .step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .step {
+    display: flex;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+
+  .step .num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .step .body h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+  }
+
+  .step .body p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .step .body code {
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-size: 12.5px;
+  }
+
+  .note {
+    border-left: 3px solid var(--warning);
+    background: rgba(234, 179, 8, 0.08);
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: var(--foreground);
+  }
+
+  .note.danger { border-left-color: var(--danger); background: rgba(239, 68, 68, 0.08); }
+  .note.info { border-left-color: var(--primary); background: rgba(79, 124, 255, 0.08); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.blue { background: var(--primary); }
+  .dot.yellow { background: var(--warning); }
+  .dot.green { background: var(--success); }
+  .dot.gray { background: var(--muted); }
+  .dot.red { background: var(--danger); }
+
+  table.faq {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  table.faq td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  table.faq td:first-child {
+    width: 42%;
+    color: var(--foreground);
+    font-weight: 500;
+  }
+
+  table.faq td:last-child { color: var(--muted); }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 600px) {
+    header .inner { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <h1><span aria-hidden="true">🏸</span> Cầu Lịch — Hướng dẫn sử dụng</h1>
+    <nav id="tabs">
+      <button data-target="chung" class="active">Bắt đầu</button>
+      <button data-target="member">Thành viên</button>
+      <button data-target="admin">Admin</button>
+      <button data-target="super">Người tạo nhóm</button>
+      <button data-target="faq">Hỏi đáp</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===================== BẮT ĐẦU ===================== -->
+  <section class="panel active" id="chung">
+    <div class="intro">
+      <strong>Cầu Lông</strong> giúp nhóm cầu lông theo dõi lịch đặt sân, ai tham gia buổi nào, và chia tiền sân/nước
+      minh bạch sau mỗi buổi chơi. Có 3 vai trò trong 1 nhóm:
+      <span class="role-badge member" style="margin: 0 4px;">Thành viên</span>
+      <span class="role-badge admin" style="margin: 0 4px;">Admin</span>
+      <span class="role-badge super" style="margin: 0 4px;">Người tạo nhóm</span>
+      — quyền càng cao thì làm được càng nhiều việc quản trị, nhưng ai cũng thấy chung 1 lịch và chung 1 luồng chia tiền.
+    </div>
+
+    <h2 class="section-title">Đăng nhập</h2>
+    <div class="step-list">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <h3>Đăng nhập bằng Google</h3>
+          <p>Vào trang chủ, bấm <code>Đăng nhập với Google</code>. Lần đầu đăng nhập, hệ thống tự tạo tài khoản cho bạn.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <h3>Vào Dashboard</h3>
+          <p>Sau khi đăng nhập, bạn thấy danh sách các nhóm mình đang tham gia. Bấm vào 1 nhóm để xem lịch trận đấu.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <h3>Chưa thuộc nhóm nào?</h3>
+          <p>Tự tạo nhóm mới ngay ở Dashboard (bạn sẽ thành <strong>Người tạo nhóm</strong>), hoặc nhờ admin của nhóm thêm bạn vào bằng email — lưu ý bạn phải đăng nhập ít nhất 1 lần trước thì admin mới thêm được.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Ý nghĩa các trạng thái trận đấu</h2>
+    <div class="legend">
+      <span class="pill"><span class="dot blue"></span>Sắp diễn ra — chưa tới giờ chơi, còn RSVP được</span>
+      <span class="pill"><span class="dot yellow"></span>Đang diễn ra — đã tới giờ, không đổi RSVP được nữa</span>
+      <span class="pill"><span class="dot yellow"></span>Chờ chốt sổ — đã chơi xong, admin chưa nhập chi phí thật</span>
+      <span class="pill"><span class="dot green"></span>Đã chốt — admin đã nhập tiền, chờ thanh toán</span>
+      <span class="pill"><span class="dot gray"></span>Đã tất toán — mọi người đã đóng đủ, admin đã xác nhận hết</span>
+    </div>
+  </section>
+
+  <!-- ===================== MEMBER ===================== -->
+  <section class="panel" id="member">
+    <h2 class="section-title"><span class="role-badge member">Thành viên</span></h2>
+    <p style="color: var(--muted); font-size: 13.5px; margin-top: -12px;">
+      Việc chính của thành viên: xác nhận có chơi hay không, xem chi phí, và thanh toán khi được yêu cầu.
+    </p>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <h3>Xác nhận tham gia (RSVP)</h3>
+          <p>Mở 1 trận đấu, chọn <code>Tham gia</code> / <code>Chưa chắc</code> / <code>Vắng</code>. Chỉ đổi được khi trận còn ở trạng thái <strong>Sắp diễn ra</strong> — khi trận đã bắt đầu, RSVP bị khoá lại.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <h3>Xem chi phí dự kiến</h3>
+          <p>Trước khi trận diễn ra, app hiện số tiền <strong>dự kiến</strong> mỗi người (tính từ trung bình các trận trước, hoặc số admin đặt sẵn). Số này chỉ để tham khảo, không phải số cuối cùng phải đóng.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <h3>Thanh toán sau khi trận được chốt sổ</h3>
+          <p>Khi admin đã <strong>Chốt sổ</strong>, bạn sẽ thấy số tiền chính xác cần đóng + mã QR. Quét QR chuyển khoản, rồi bấm <code>Đã chuyển khoản</code> để báo cho admin biết.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <h3>Chờ admin xác nhận</h3>
+          <p>Trạng thái đổi từ <em>Chưa đóng</em> → <em>Chờ xác nhận</em> → <em>Đã xác nhận</em> khi admin kiểm tra đã nhận được tiền.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">5</div>
+        <div class="body">
+          <h3>Rời nhóm</h3>
+          <p>Vào trang nhóm, bấm <code>Rời nhóm</code> ở cuối trang. Chỉ rời được nếu không còn <strong>nghĩa vụ</strong>: không có trận đã bắt đầu mà bạn RSVP tham gia nhưng admin chưa chốt sổ, và không còn khoản thanh toán nào chưa được admin xác nhận.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note info">
+      Rời nhóm không xoá lịch sử — bạn chỉ mất quyền truy cập, dữ liệu các trận đã chơi vẫn được giữ nguyên trong nhóm.
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN ===================== -->
+  <section class="panel" id="admin">
+    <h2 class="section-title"><span class="role-badge admin">Admin</span></h2>
+    <p style="color: var(--muted); font-size: 13.5px; margin-top: -12px;">
+      Admin làm được mọi việc của Thành viên, cộng thêm quyền quản lý trận đấu và thành viên trong nhóm.
+    </p>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <h3>Tạo trận đấu mới</h3>
+          <p>Đặt sân trên <code>datlich.alobo.vn</code> như bình thường → vào nhóm, bấm <code>+ Tạo trận</code> → upload ảnh chụp màn hình đặt lịch (làm bằng chứng) + nhập ngày giờ, sân, số người dự kiến.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <h3>Sửa chi phí dự kiến riêng cho trận đó</h3>
+          <p>Trên trang chi tiết trận (khi chưa chốt sổ), bấm <code>Sửa chi phí dự kiến</code> nếu biết giá sân/nước tuần này khác mức trung bình tự tính.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <h3>Chốt sổ sau khi trận kết thúc</h3>
+          <p>Khi trận chuyển sang <strong>Chờ chốt sổ</strong> (đã hết giờ chơi), bấm nút <code>Chốt sổ trận đấu</code>: nhập tiền sân/nước/phát sinh thực tế, tick chọn đúng những ai đã chơi thật (không nhất thiết giống RSVP) → hệ thống tự chia đều và khoá số tiền từng người.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
+          <h3>Xác nhận thanh toán</h3>
+          <p>Khi thành viên bấm "Đã chuyển khoản", bạn kiểm tra tài khoản ngân hàng rồi bấm <code>Xác nhận</code>. Khi tất cả đã xác nhận, trận tự chuyển sang <strong>Đã tất toán</strong>.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">5</div>
+        <div class="body">
+          <h3>Thêm / xoá thành viên</h3>
+          <p>Vào <code>Cài đặt nhóm</code> → gõ email vào ô thêm thành viên (có gợi ý tự động), hoặc bấm <code>Xoá</code> cạnh tên người muốn xoá. Xoá 1 người sẽ gỡ RSVP của họ khỏi các trận <strong>chưa diễn ra</strong>; lịch sử các trận đã chơi/đã chốt sổ vẫn được giữ nguyên.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">6</div>
+        <div class="body">
+          <h3>Cài đặt nhóm</h3>
+          <p>Cũng trong <code>Cài đặt nhóm</code>: đổi ảnh đại diện/tên nhóm, QR thanh toán mặc định, thông tin ngân hàng, link Discord Webhook để nhận thông báo, và mức tiền dự kiến mặc định (dùng khi nhóm chưa có trận nào để tính trung bình).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SUPER ADMIN ===================== -->
+  <section class="panel" id="super">
+    <h2 class="section-title"><span class="role-badge super">Người tạo nhóm</span></h2>
+    <p style="color: var(--muted); font-size: 13.5px; margin-top: -12px;">
+      Người tạo nhóm (tự động có khi bấm "Tạo nhóm") có toàn bộ quyền Admin, cộng thêm 3 quyền chỉ mình họ mới có.
+    </p>
+
+    <div class="step-list">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="body">
+          <h3>Cấp / thu quyền Admin</h3>
+          <p>Trong <code>Cài đặt nhóm</code> → mục Thành viên, bấm <code>Đặt làm Admin</code> hoặc <code>Bỏ quyền Admin</code> cạnh tên từng người. Đây là cách duy nhất để nhóm có nhiều hơn 1 admin.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="body">
+          <h3>Rời nhóm</h3>
+          <p>Cũng dùng nút <code>Rời nhóm</code> như thành viên thường, nhưng có thêm 1 điều kiện: <strong>phải có ít nhất 1 Admin khác</strong> trong nhóm trước khi bạn rời — nếu chưa có, hãy cấp quyền Admin cho ai đó trước (bước 1).</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="body">
+          <h3>Xoá nhóm vĩnh viễn</h3>
+          <p>Ở cuối trang <code>Cài đặt nhóm</code>, mục "Vùng nguy hiểm" → <code>Xoá nhóm vĩnh viễn</code>. Thao tác này xoá toàn bộ trận đấu, thành viên và lịch sử thanh toán, <strong>không thể khôi phục</strong>. Chỉ dùng khi chắc chắn không cần nhóm này nữa.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="note danger">
+      Khác với "Rời nhóm" (chỉ mất quyền truy cập, dữ liệu vẫn còn), "Xoá nhóm" xoá sạch dữ liệu vĩnh viễn. Hãy chắc chắn trước khi bấm.
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="panel" id="faq">
+    <h2 class="section-title">Câu hỏi thường gặp</h2>
+    <table class="faq">
+      <tr>
+        <td>Sao tôi không đổi được RSVP nữa?</td>
+        <td>Trận đã bắt đầu (hoặc đã chốt sổ). RSVP chỉ đổi được khi trận còn ở trạng thái "Sắp diễn ra".</td>
+      </tr>
+      <tr>
+        <td>Sao tôi chưa thấy nút thanh toán?</td>
+        <td>Trận chưa được admin "Chốt sổ" — số tiền dự kiến hiển thị trước đó chỉ để tham khảo, chưa cho phép thanh toán.</td>
+      </tr>
+      <tr>
+        <td>Sao tôi không rời nhóm được?</td>
+        <td>Bạn còn "nghĩa vụ": có trận đã bắt đầu mà bạn RSVP tham gia nhưng chưa được chốt sổ, hoặc còn khoản thanh toán admin chưa xác nhận. Xử lý xong các khoản đó rồi thử lại.</td>
+      </tr>
+      <tr>
+        <td>Sao admin không thêm được tôi vào nhóm?</td>
+        <td>Bạn cần đăng nhập vào app (bằng Google) ít nhất 1 lần trước — hệ thống chỉ thêm được người đã có tài khoản.</td>
+      </tr>
+      <tr>
+        <td>Người tạo nhóm rời nhóm thì sao?</td>
+        <td>Phải có Admin khác thay thế trước. Sau khi rời, dữ liệu nhóm vẫn còn nguyên, chỉ là không còn ai giữ quyền cao nhất (không xoá được nhóm nữa) trừ khi có SUPER_ADMIN khác.</td>
+      </tr>
+      <tr>
+        <td>Số tiền dự kiến và số tiền thật khác nhau?</td>
+        <td>Bình thường — số dự kiến chỉ là ước tính trước trận. Số tiền thật chỉ chốt sau khi admin nhập chi phí thực tế và bấm "Chốt sổ".</td>
+      </tr>
+    </table>
+  </section>
+
+</main>
+
+<footer>Cầu Lông — hướng dẫn sử dụng nội bộ nhóm</footer>
+
+<script>
+  const buttons = document.querySelectorAll('#tabs button');
+  const panels = document.querySelectorAll('.panel');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>

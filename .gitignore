@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# local-dev upload fallback (see src/app/api/upload/route.ts)
+/public/uploads
