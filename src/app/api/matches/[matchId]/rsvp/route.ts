@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { AuthzError, requireMember } from "@/lib/authz";
 import { zodFirstError } from "@/lib/api-error";
 import { getEffectiveStatus } from "@/lib/match-status";
+import { recomputeEstimatedPerPerson } from "@/lib/estimate";
 
 const rsvpSchema = z.object({
   rsvpStatus: z.enum(["GOING", "MAYBE", "NOT_GOING"]),
@@ -43,6 +44,8 @@ export async function PATCH(
     create: { matchId, userId: session.user.id, rsvpStatus: body.data.rsvpStatus },
     update: { rsvpStatus: body.data.rsvpStatus },
   });
+
+  await recomputeEstimatedPerPerson(matchId);
 
   return NextResponse.json({ participation });
 }

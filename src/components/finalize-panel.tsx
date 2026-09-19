@@ -4,7 +4,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toErrorMessage } from "@/lib/to-error-message";
 
-type MemberOption = { userId: string; name: string | null; email: string | null; defaultChecked: boolean };
+type MemberOption = {
+  userId: string;
+  name: string | null;
+  email: string | null;
+  defaultChecked: boolean;
+  hasLeftGroup: boolean;
+};
 
 export function FinalizePanel({ matchId, members }: { matchId: string; members: MemberOption[] }) {
   const router = useRouter();
@@ -104,6 +110,9 @@ export function FinalizePanel({ matchId, members }: { matchId: string; members: 
                 onChange={() => toggle(m.userId)}
               />
               {m.name ?? m.email}
+              {m.hasLeftGroup && (
+                <span className="text-xs text-danger">(đã rời nhóm — vẫn tính tiền nếu đã chơi)</span>
+              )}
             </label>
           ))}
         </div>

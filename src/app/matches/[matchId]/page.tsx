@@ -16,6 +16,56 @@ function formatVnd(amount: number) {
   return amount.toLocaleString("vi-VN") + "đ";
 }
 
+type ActiveMember = { userId: string; user: { name: string | null; email: string | null } };
+type ParticipationRow = {
+  userId: string;
+  rsvpStatus: string;
+  user: { name: string | null; email: string | null };
+};
+
+/**
+ * Who can be selected + charged when finalizing: every current active
+ * member, PLUS anyone who already has a Participation row on this specific
+ * match even if they've since left or been removed from the group. Without
+ * that second group, someone who actually played and then left right before
+ * finalize would vanish from this list entirely and become uncharegable —
+ * exactly the "admin thất thoát tiền" gap this was built to close.
+ */
+function buildFinalizeCandidates(
+  activeMembers: ActiveMember[],
+  match: { participations: ParticipationRow[] }
+) {
+  const candidates = new Map<
+    string,
+    { userId: string; name: string | null; email: string | null; defaultChecked: boolean; hasLeftGroup: boolean }
+  >();
+
+  for (const m of activeMembers) {
+    const participation = match.participations.find((p) => p.userId === m.userId);
+    candidates.set(m.userId, {
+      userId: m.userId,
+      name: m.user.name,
+      email: m.user.email,
+      defaultChecked: participation?.rsvpStatus === "GOING",
+      hasLeftGroup: false,
+    });
+  }
+
+  for (const p of match.participations) {
+    if (!candidates.has(p.userId)) {
+      candidates.set(p.userId, {
+        userId: p.userId,
+        name: p.user.name,
+        email: p.user.email,
+        defaultChecked: p.rsvpStatus === "GOING",
+        hasLeftGroup: true,
+      });
+    }
+  }
+
+  return Array.from(candidates.values());
+}
+
 export default async function MatchDetailPage({
   params,
 }: {
@@ -155,16 +205,7 @@ export default async function MatchDetailPage({
         )}
 
         {isAdmin && effectiveStatus === "AWAITING_FINALIZE" && (
-          <FinalizePanel
-            matchId={match.id}
-            members={activeMembers.map((m) => ({
-              userId: m.userId,
-              name: m.user.name,
-              email: m.user.email,
-              defaultChecked:
-                match.participations.find((p) => p.userId === m.userId)?.rsvpStatus === "GOING",
-            }))}
-          />
+          <FinalizePanel matchId={match.id} members={buildFinalizeCandidates(activeMembers, match)} />
         )}
 
         {match.payments.length > 0 && (

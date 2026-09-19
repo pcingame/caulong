@@ -37,3 +37,31 @@ export async function estimateMatchCost(groupId: string, expectedParticipants: n
 
   return { estimatedCourtFee, estimatedWaterFee, estimatedPerPerson };
 }
+
+/**
+ * estimatedPerPerson is a snapshot taken at match-creation time (or last
+ * manual edit) — it doesn't move on its own as people RSVP. Call this after
+ * every RSVP change so the displayed "dự kiến" figure reflects who's
+ * actually currently marked GOING, not the headcount from whenever the
+ * match was first created. No-op if there's no court/water estimate yet
+ * (nothing to split).
+ */
+export async function recomputeEstimatedPerPerson(matchId: string) {
+  const match = await prisma.match.findUnique({
+    where: { id: matchId },
+    select: {
+      estimatedCourtFee: true,
+      estimatedWaterFee: true,
+      participations: { where: { rsvpStatus: "GOING" }, select: { id: true } },
+    },
+  });
+  if (!match) return;
+  if (match.estimatedCourtFee == null && match.estimatedWaterFee == null) return;
+
+  const goingCount = Math.max(match.participations.length, 1);
+  const estimatedPerPerson = Math.ceil(
+    ((match.estimatedCourtFee ?? 0) + (match.estimatedWaterFee ?? 0)) / goingCount
+  );
+
+  await prisma.match.update({ where: { id: matchId }, data: { estimatedPerPerson } });
+}

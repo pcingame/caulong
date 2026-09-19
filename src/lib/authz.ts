@@ -41,9 +41,12 @@ export async function requireSuperAdmin(groupId: string, userId: string) {
 /**
  * Debt / in-progress rule for leaving a group:
  * - blocked if any match has already started (ongoing, or ended but not yet
- *   finalized) where the member RSVP'd going — covers both "mid-match" and
- *   "AWAITING_FINALIZE" (see lib/match-status.ts), since obligation isn't
- *   settled either way
+ *   finalized) where the member RSVP'd GOING or MAYBE — covers both
+ *   "mid-match" and "AWAITING_FINALIZE" (see lib/match-status.ts), since
+ *   obligation isn't settled either way. MAYBE is included, not just GOING:
+ *   admin's finalize step can select anyone regardless of RSVP, so someone
+ *   who said "maybe" and actually showed up must still be blocked from
+ *   slipping out before they can be charged.
  * - blocked if any finalized/settled match still has an unconfirmed
  *   payment for the member
  */
@@ -57,7 +60,7 @@ export async function getLeaveBlockers(groupId: string, userId: string) {
         groupId,
         status: "UPCOMING",
         startTime: { lte: new Date() },
-        participations: { some: { userId, rsvpStatus: "GOING" } },
+        participations: { some: { userId, rsvpStatus: { in: ["GOING", "MAYBE"] } } },
       },
       select: { id: true, date: true, courtLocation: true },
     }),
